@@ -1,12 +1,9 @@
 # -*- coding: utf-8 -*-
 """
-Spyder Editor
-
-This is a temporary script file.
+entrega-clase-2-GM.py
 """
 import math
 """
-Ejercicio 1:
 Cuente la cantidad de veces que aparece un substring en un dado string. 
 Hágalo en los dos casos: distinguiendo entre mayúsculas y minúsculas, y 
 no distinguiendo. Realícelo, buscando los substrings es, la, que, co, en 
@@ -22,13 +19,13 @@ for j in m:
     print(j,'->',"sensitive",s.count(j),"insensitive",s.lower().count(j))
     
 # se cuentan las palabras contando los espacios + 1 
-print("cantidad de palabras:",s.count(" ")+1)
+print("Cantidad de palabras en s:",s.count(" ")+1)
 
 """
 Forme un nuevo string de 10 caracteres que contenga los 5 primeros y los 5 
 últimos del string anterior s.
 """
-print("Solucion:",s[:5]+s[-5:])
+print("Los 5 primero y los 5 ultimos caracteres:",s[:5]+s[-5:])
 
 """
 Forme un nuevo string que contenga los 10 caracteres centrales de s 
@@ -37,10 +34,17 @@ Forme un nuevo string que contenga los 10 caracteres centrales de s
 n=10
 z=(len(s)-n)/2
 extracto=s[math.floor(z):-math.ceil(z)]
-print(extracto)
-print(len(extracto))
+print('Los',len(extracto),'caracteres centrales:',extracto)
 
 """
 Cambie todas las letras "a" por "e" y todas las letras "e" por "a" 
 en el string s
 """
+S=list(s)
+for i in range(len(S)):
+    if S[i]=='a':
+        S[i]='e'
+    elif S[i]=='e':
+        S[i]='a'
+print('Nuevo string con los caracteres a y e intercambiados')
+print(''.join(S))
