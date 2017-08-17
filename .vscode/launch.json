@@ -13,7 +13,6 @@
             "envFile": "${workspaceRoot}/.env",
             "debugOptions": [
                 "WaitOnAbnormalExit",
-                "WaitOnNormalExit",
                 "RedirectOutput"
             ]
         },
@@ -37,7 +36,6 @@
             "envFile": "${workspaceRoot}/.env",
             "debugOptions": [
                 "WaitOnAbnormalExit",
-                "WaitOnNormalExit",
                 "RedirectOutput"
             ]
         },
@@ -53,7 +51,6 @@
             "envFile": "${workspaceRoot}/.env",
             "debugOptions": [
                 "WaitOnAbnormalExit",
-                "WaitOnNormalExit",
                 "RedirectOutput"
             ]
         },
@@ -70,7 +67,6 @@
             "envFile": "${workspaceRoot}/.env",
             "debugOptions": [
                 "WaitOnAbnormalExit",
-                "WaitOnNormalExit"
             ]
         },
         {
@@ -85,8 +81,7 @@
             "env": {},
             "envFile": "${workspaceRoot}/.env",
             "debugOptions": [
-                "WaitOnAbnormalExit",
-                "WaitOnNormalExit"
+                "WaitOnAbnormalExit"
             ]
         },
         {
@@ -106,7 +101,6 @@
             "envFile": "${workspaceRoot}/.env",
             "debugOptions": [
                 "WaitOnAbnormalExit",
-                "WaitOnNormalExit",
                 "RedirectOutput",
                 "DjangoDebugging"
             ]
@@ -130,7 +124,6 @@
             "envFile": "${workspaceRoot}/.env",
             "debugOptions": [
                 "WaitOnAbnormalExit",
-                "WaitOnNormalExit",
                 "RedirectOutput"
             ]
         },
@@ -147,7 +140,6 @@
             "envFile": "${workspaceRoot}/.env",
             "debugOptions": [
                 "WaitOnAbnormalExit",
-                "WaitOnNormalExit",
                 "RedirectOutput"
             ]
         },
@@ -165,7 +157,6 @@
             ],
             "debugOptions": [
                 "WaitOnAbnormalExit",
-                "WaitOnNormalExit",
                 "RedirectOutput",
                 "Pyramid"
             ]
@@ -187,7 +178,6 @@
             "envFile": "${workspaceRoot}/.env",
             "debugOptions": [
                 "WaitOnAbnormalExit",
-                "WaitOnNormalExit",
                 "RedirectOutput"
             ]
         },
