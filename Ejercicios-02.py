@@ -56,10 +56,13 @@ print(cantidad)
 '''8.6. Ordene la lista L1 tal que las palabras más largas estén primero.'''
 '''8.6. Construya un string s2 con la lista del resultado del punto anterior.'''
 '''8.6. Encuentre la palabra más larga y la más corta de la frase.'''
-'''9. Escriba un script (llamado distancia1.py) que defina las variables velocidad y posición inicial,
-   la aceleración g, y la masa kg a tiempo t_0, y calcule e imprima la posición y velocidad a un tiempo posterior t.
-   Ejecute el programa para varios valores de posición y velocidad inicial para segundos. 
-   Recuerde que las ecuaciones de movimiento con aceleración constante son:'''
+'''9. Escriba un script (llamado distancia1.py) que defina las variables velocidad y posición inicial v_0, z_0,
+   la aceleración g, y la masa m=1kg a tiempo t_=, y calcule e imprima la posición y velocidad a un tiempo posterior t.
+   Ejecute el programa para varios valores de posición y velocidad inicial para t=2s. 
+   Recuerde que las ecuaciones de movimiento con aceleración constante son:
+   v=v_0-gt
+   z=z_0+v_0t-gt^2/2'''
 
 '''10. Calcular la suma:
+s_1=1/2*(sum_0_100 k)^-1
    Ayuda: busque información sobre la función sum()'''
