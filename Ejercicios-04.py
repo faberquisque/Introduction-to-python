@@ -3,10 +3,11 @@
     elemento en un diccionario de la forma:
         d = {'S': 'Al', 'Z':13, 'A':27, 'M': '26.98153863(12)', 'P': 1.0000, 'MS':26.9815386(8)'}
 '''
-file=open(../data/aluminnio.dat,'r')
-dictionary = file.readlines()
+file=open('./data/aluminio.dat','r')
+dataSTR=str.splitlines(file.read())
+dictionary = dict()
 file.close()     
-print(dictionary)         
+print((dictionary))
 '''1.2. Modifique el programa anterior para que las masas sean números (float) 
     y descarte el valor de la incerteza (el número entre paréntesis)
 '''
