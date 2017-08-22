@@ -110,26 +110,48 @@ def ReadElementsFile(fileName):
     elementos y un argumento opcional reverse con valor por defecto False. Este 
     argumento indica si los elementos se ordenan alfabéticamente de la manera 
     natural (a,b,c...,y,z) o inversa (z,y,x, ... b,a).'''
-def PrintElementsBySymbol(elementos,reverser=False):
+def ElementsBySymbolToString(elementos,reverser=False):
+    '''Escribe en un string todos los elementos ordenados alfabeticamente por clave a partir del diccionario. El parametro reverser invierte el orden'''
     listaOrdenada=sorted(elementos.values(),key=lambda a: a['Atomic Symbol'], reverse=reverser)
+    s=list()
     for z in listaOrdenada:
-        print('Elemento:',z['Atomic Symbol'])
-        print('Z =',z['Atomic Number'])
-        print('A =',z['Mass Number'])
-        print('Masa =','{0: >.4f}'.format(float(z['Relative Atomic Mass'])))
-        print('Abundancia: ', '{0: >.3f}'.format(float(z['Isotopic Composition'])))
-        print('Masa Promedio =','{0: >#016.4f}'.format(float(z['Standard Atomic Weight'])),'\n')
-
-PrintElementsBySymbol(ReadElementsFile('elementos.dat'),True)
+        s.append('Elemento: '+z['Atomic Symbol']+'\n')
+        s.append('Z = '+z['Atomic Number']+'\n')
+        s.append('A = '+z['Mass Number']+'\n')
+        s.append('Masa = '+'{0: >.4f}'.format(float(z['Relative Atomic Mass']))+'\n')
+        s.append('Abundancia = '+'{0: >.3f}'.format(float(z['Isotopic Composition']))+'\n')
+        s.append('Masa Promedio = '+'{0: >.4f}'.format(float(z['Standard Atomic Weight']))+'\n\n')
+    return ''.join(s)
 '''3.3. Una función que reciba un nombre de archivo y un string y escriba 
     el string en el archivo dado.'''
+def WriteStringToFile(fileName, infoString):
+    '''Escribe el string infoString en el archivo fileName'''
+    import os
+    os.makedirs(os.path.dirname(fileName), exist_ok=True)
+    file = open(fileName,'w')    
+    file.write(infoString)
+    file.close()
+
 '''3.4. Finalmente, escriba también el código llamando a las funciones 
     anteriores para realizar el trabajo de lectura y escritura de los elementos 
     en archivos.
 '''
+d=ReadElementsFile('elementos.dat')
+s=ElementsBySymbolToString(d,False)
+print(s)
+WriteStringToFile('./output/elementos.dat',s)
 '''4. Escriba funciones para analizar la divisibilidad de enteros:'''
 '''4.1. La función es_divisible1(x) que retorna verdadero si x es divisible 
     por alguno de 2,3,5,7 o falso en caso contrario.'''
+def es_divisible1(x):
+    L=[2,3,5,7]
+    flag=False
+    for i in L:
+        if x%i == 0:
+            flag=True
+    return flag
+
+print(es_divisible1(13))
 '''4.2. La función es_divisible_por_lista que cumple la misma función que 
     es_divisible1 pero recibe dos argumentos: el entero x y una variable del 
     tipo lista que contiene los valores para los cuáles debemos examinar la 
@@ -138,6 +160,13 @@ PrintElementsBySymbol(ReadElementsFile('elementos.dat'),True)
         es_divisible_por_lista(x, [2,3,5,7])
         is_divisible_por_lista(x)
 '''
+def es_divisible_por_lista(x,lista):
+    flag = False
+    for i in lista:
+        if x%i == 0:
+            flag=True
+    return flag
+print(es_divisible_por_lista(13,[2,3,5,7]))
 '''4.3. La función es_divisible_por cuyo primer argumento (mandatorio) es x, 
     y luego puede aceptar un número indeterminado de argumentos:
         es_divisible_por(x)  # retorna verdadero
@@ -145,3 +174,15 @@ PrintElementsBySymbol(ReadElementsFile('elementos.dat'),True)
         es_divisible_por(x, 2, 3, 5, 7) # igual resultado que es_divisible1(x)
         es_divisible_por(x, 2, 3, 5, 7, 9, 11, 13)  # o cualquier lista de argumentos debe funcionar
 '''
+def es_divisible_por(x, *lista):
+    flag = False
+    if len(lista)==0:
+        flag=True
+    else:
+        for i in lista:
+            if x%i == 0:
+                flag=True
+    return flag
+
+print(es_divisible_por(13, 2, 3, 5, 7))
+print(es_divisible_por(13))
