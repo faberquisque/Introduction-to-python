@@ -5,12 +5,23 @@
 '''
 file=open('./data/aluminio.dat','r')
 dataSTR=str.splitlines(file.read())
-dictionary = dict()
+dictionary = dict(pair.split(' = ') for pair in dataSTR)
 file.close()     
-print((dictionary))
+print(dictionary)
 '''1.2. Modifique el programa anterior para que las masas sean números (float) 
     y descarte el valor de la incerteza (el número entre paréntesis)
 '''
+file=open('./data/aluminio.dat','r')
+#dataSTR=str.splitlines(file.read())
+dictionary = {}
+for pair in str.splitlines(file.read()):
+    key, value = pair.split(' = ')
+    if value.find('(')>-1:
+        dictionary[key]=value.split('(')[0]
+    else:
+        dictionary[key]=value
+file.close()     
+print(dictionary)
 
 '''1.3. Agregue el código necesario para obtener una impresión de la forma:
     Elemento: S
@@ -19,6 +30,11 @@ print((dictionary))
     Masa: 26.98154
 Note que la masa sólo debe contener 5 números decimales
 '''
+print('Elemento:', dictionary['Atomic Symbol'])
+print('Número Atómico:', dictionary['Atomic Number'])
+print('Número de Masa:', dictionary['Mass Number'])
+print('Masa:', '{0:.8}'.format(dictionary['Standard Atomic Weight']))
+
 '''2. Realice un programa para:'''
 '''2.1. Leer el archivo elementos.dat y guardar los datos en un 
     diccionario, cuyas claves serán los símbolos del elemento:
@@ -27,12 +43,52 @@ Note que la masa sólo debe contener 5 números decimales
     anterior. Por ejemplo:
         elementos['H'] = {'S': 'H', 'Z':1, 'A':1, 'M': 1.00782503207, 'P': 0.999885, 'MS':1.00794}
 '''
+file = open('./data/elementos.dat','r')
+elementos = dict()
+data = str.split(file.read(),sep='\n\n')
+for elemento in data:
+    caracteristicas = dict()
+    for pair in elemento.splitlines():
+        key, value = pair.split(' = ')
+        if value.find('(')>-1:
+            caracteristicas[key]=value.split('(')[0]
+        else:
+            caracteristicas[key]=value
+    elementos[caracteristicas['Atomic Symbol']] = caracteristicas
+file.close() 
+for z in elementos: print(z)
 '''2.2. Imprimir todos los elementos, en un formato legible (y si le sale: 
     agradable) para personas, ordenados en valores crecientes de masa.'''
+lista1=sorted(elementos.values(), key=lambda a: int(a['Atomic Number']))
+print('Elemento','N° Atomico','N° de Masa','Masa', sep='\t| ')
+for z in lista1: print(z['Atomic Symbol'],z['Atomic Number'],z['Mass Number'],'{0: >#016.4f}'.format(float(z['Standard Atomic Weight'])),sep='\t\t| ')
+
 '''3. PARA ENTREGAR: Adapte los programas realizados en el punto anterior 
     para trabajar con funciones. Se requiere que escriba:'''
 '''3.1. Una función que lea un archivo (cuyo nombre es el argumento) y devuelva
     un diccionario donde cada clave es el símbolo del elemento.'''
+def ReadElementsFile(fileName):
+    '''lee el archivo #fileName y devuelve un diccionario donde cada clave es el simbolo del elemento'''        
+    file = open('./data/elementos.dat','r')
+    elementos = dict()
+    data = str.split(file.read(),sep='\n\n')
+    for elemento in data:
+        caracteristicas = dict()
+        for pair in elemento.splitlines():
+            splittedPair = pair.split(' = ')
+            if len(splittedPair) == 2:
+                key, value = splittedPair 
+                if value.find('(')>-1:
+                    caracteristicas[key]=value.split('(')[0]
+                #elif value.isnumeric:
+                 #   caracteristicas[key] = int(value)
+                else:
+                    caracteristicas[key]=value
+            else:
+                print('Archivo mal escrito para carga de datos')
+        elementos[caracteristicas['Atomic Symbol']] = caracteristicas
+    file.close()
+    return elementos
 '''3.2. Una función que escriba en un string todos los elementos, ordenados 
     alfabéticamente por clave, en una forma similar a:
         s = 
@@ -54,6 +110,17 @@ Note que la masa sólo debe contener 5 números decimales
     elementos y un argumento opcional reverse con valor por defecto False. Este 
     argumento indica si los elementos se ordenan alfabéticamente de la manera 
     natural (a,b,c...,y,z) o inversa (z,y,x, ... b,a).'''
+def PrintElementsBySymbol(elementos,reverser=False):
+    listaOrdenada=sorted(elementos.values(),key=lambda a: a['Atomic Symbol'], reverse=reverser)
+    for z in listaOrdenada:
+        print('Elemento:',z['Atomic Symbol'])
+        print('Z =',z['Atomic Number'])
+        print('A =',z['Mass Number'])
+        print('Masa =','{0: >.4f}'.format(float(z['Relative Atomic Mass'])))
+        print('Abundancia: ', '{0: >.3f}'.format(float(z['Isotopic Composition'])))
+        print('Masa Promedio =','{0: >#016.4f}'.format(float(z['Standard Atomic Weight'])),'\n')
+
+PrintElementsBySymbol(ReadElementsFile('elementos.dat'),True)
 '''3.3. Una función que reciba un nombre de archivo y un string y escriba 
     el string en el archivo dado.'''
 '''3.4. Finalmente, escriba también el código llamando a las funciones 
