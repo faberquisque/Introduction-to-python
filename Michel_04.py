@@ -1,3 +1,5 @@
+print('Gaston Michel')
+
 '''3. PARA ENTREGAR: Adapte los programas realizados en el punto anterior 
     para trabajar con funciones. Se requiere que escriba:'''
 '''3.1. Una función que lea un archivo (cuyo nombre es el argumento) y devuelva
@@ -62,7 +64,7 @@ def ElementsBySymbolToString(elementos,reverser=False):
 def WriteStringToFile(fileName, infoString):
     '''Escribe el string infoString en el archivo fileName'''
     import os
-    os.makedirs(os.path.dirname(fileName), exist_ok=True)
+    os.makedirs(os.path.dirname(fileName), exist_ok=True) #se asegura que si el directorio no existe lo crea
     file = open(fileName,'w')    
     file.write(infoString)
     file.close()
@@ -74,4 +76,4 @@ def WriteStringToFile(fileName, infoString):
 d=ReadElementsFile('elementos.dat')
 s=ElementsBySymbolToString(d,False)
 print(s)
-WriteStringToFile('./output/elementos.dat',s)
+WriteStringToFile('elementos.dat',s)

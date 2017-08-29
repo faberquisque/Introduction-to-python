@@ -146,11 +146,27 @@ A(x1,…,xn)=x_med=(x_1+⋯+x_n)/n
 G(x1,…,xn)=power(prod(x_1⋯x_n),1/n)
 H(x1,…,xn)=n/(x1^{-1}+⋯+x_n^{n})
 '''
- 
+def media(lista):
+    return sum(lista)/len(lista)
+def geometrica(lista):
+    prod=1
+    for i in lista:
+        prod *=i
+    return prod**(1/len(lista))
+def armonica(lista):
+    arm=0
+    for i in lista:
+        arm += 1/i
+    return len(lista)/arm
 '''Calcular la desviación estándard:
 σ≡^sqrt(1/n*∑_i (xi−x_med)^2)
 '''
- 
+ def desviacion(lista)
+    desv=0
+    prom=media(lista)
+    for i in lista
+        desv += (i-prom)**2
+    return (desv/len(lista))**0.5
 '''Calcular la mediana, que se define como el valor para el 
 cual la mitad de los valores de la lista es menor que ella. Si el 
 número de elementos es par, se toma el promedio entre los dos 
