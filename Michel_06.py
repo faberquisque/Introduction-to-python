@@ -1,4 +1,4 @@
-class Polinomio("Objeto padre"):
+class Polinomio:
 
   def __init__(self, coefs=[]):
     """Crea el objeto. Si los coeficientes son proporcionados lo inicializa
@@ -9,8 +9,9 @@ class Polinomio("Objeto padre"):
       self.coeficientes=coefs
     else:
       print('ERROR: polinomio de grado mayor que 9')
+    return None
 
-  def set_coeficientes(coefs=[]):
+  def set_coeficientes(self, coefs=[]):
     """Si los coeficientes son proporcionados lo inicializa
     Keyword Arguments:
     coefs -- Una lista de coeficientes
@@ -20,22 +21,22 @@ class Polinomio("Objeto padre"):
     else:
       print('ERROR: polinomio de grado mayor que 9')
 
-  def grado():
+  def grado(self):
     "Devuelve el grado del polinomio (un entero)"
     return len(self.coeficientes)-1
 
-  def get_coeficientes():
+  def get_coeficientes(self):
     """Devuelve los coeficientes del polinomio """
     return self.coeficientes
 
-  def suma_pol(p1):
+  def suma_pol(self, p1):
     """Al polinomio le suma el polinomio `p1` y devuelve un nuevo polinomio
     Keyword Arguments:
     p1 -- Polinomio a sumar
     """
     return Polinomio([x+y for x,y in itertools.zip_longest(self.coeficientes, p1.coeficientes, fillvalue=0)])
 
-  def derivada(n=1):
+  def derivada(self, n=1):
     """Devuelve la derivada (n-ésima) del polinomio (un nuevo polinomio)
     Keyword Arguments:
     n -- (default 1) Orden de derivación
@@ -45,6 +46,8 @@ class Polinomio("Objeto padre"):
     >>> P1 = P.derivada()
     >>> P2 = P.derivada(n=2)
     """
+    if n > self.grado():
+      return Polinomio([0])   #solucion trivial
     result = Polinomio([x*y for x,y in enumerate(self.coeficientes)][1::])
     if n==1:
       return result
@@ -52,23 +55,40 @@ class Polinomio("Objeto padre"):
       return result.derivada(n-1)
     
 
-  def integrada(n=1,cte=0):
+  def integrada(self, n=1,cte=(0,)):
     """Devuelve la antiderivada (n-ésima) del polinomio (un nuevo polinomio)
 
     Keyword Arguments:
     n -- (default 1) Orden de integración
-    cte -- (default 0) Constante de integración
+    cte -- (default 0) Constante de integración (tuple)
 
     Modo de uso:
     >>> P = Polinomio([0.1,2,3,0,1)
     >>> P1 = P.integrada()
     >>> P2 = P.integrada(cte=1.2, n=2)
     """
-    result
+    if n > len(cte):
+      cte=cte+(0,)
+    result = Polinomio([cte[0], self.coeficientes[0]]+[a/(i+1) for i,a in list(enumerate(self.coeficientes))[1::]])
+    if n==1:
+      return result
+    else:
+      return result.integrada(n-1,cte[1::])
 
   def __str__(self):
     "Devuelve un string con la representación del polinomio"
-    pass
+    result = []
+    for i,a in enumerate(self.coeficientes):
+      if i == 0:
+        if a != 0:
+          result.append('{}'.format(a))
+      elif i == 1:
+        if a != 0:
+          result.append('{:+}*x'.format(a))
+      else:
+        if a != 0:
+          result.append('{:+}*x^{}'.format(a,i))
+    return ''.join(result)
 
   def from_string(self, s, var='x'):
     """
@@ -83,16 +103,20 @@ class Polinomio("Objeto padre"):
     No devuelve nada.
     Nota: Si una potencia aparece más de una vez, sus coeficientes se suman
     """
-    pass
+    sumas = s.split('+')
+    if len(sumas)==1:
+
 
 
 if __name__ == '__main__':
 
-  print('Nombre Apellido')
+  print('Gaston Michel')
 
   P1 = Polinomio([1, 2.1, 3, 1.])   # 1 + 2.1x + 3 x^2 + x^4
   P2 = Polinomio([0, 1, 0, -1, -2])  # x - x^3 - 2x^4
-
+  der=P1.integrada(5,(1,1,1,1,1))
+  print(P1)
+'''
   print(P1.get_coeficientes())
   print(P1.suma_pol(P2).get_coeficientes())
   P11 = P1.derivada()
@@ -106,3 +130,4 @@ if __name__ == '__main__':
   P3 = Polinomio()
   P3.from_string('x + 1 - x^2 - 3x^3')
   print(P3.get_coeficientes())
+  '''
