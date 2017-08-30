@@ -109,38 +109,28 @@ class Polinomio:
     if len(sumas) == 1:
       restas = s.split('-')
       if len(restas) == 1 or (len(restas)==2 and restas[0]==''):  #  si es un monomio o un binomio del estilo '0-a*x^n'
-        potencia = s.split('^')
-        if len(potencia) == 1:                        #sin potencia
-          constante = s.split(var)
-          a = constante[0].strip()
-          if len(constante) == 1:                         #sin x -> es una constante 'a'!
-            if a == '':
-              a = 0
-            self.coeficientes = [float(a)]                  # PARSE!!
-          elif constante[1].strip() == '':                #con x -> es un termino lineal 'a*x'!
-            if a == '': #'x'
-              a = 1
-            elif a == '-': #'-x'
-              a = -1
-            self.coeficientes = [0,float(a)]                # PARSE!!
-          else:
-            print('ERROR: mas de una x por termino')      #ERROR 'x'
-        elif len(potencia) == 2:                       #con potencia
-          n = int(potencia[1])
-          constante = potencia[0].split(var)
-          a = constante[0].strip()
+        var_split = s.split(var)
+        a = ''.join(var_split[0].split()) # se asume que la constante siempre esta a la izquierda de 'x'
+        if len(var_split) == 1:# es un termino independiente, n = 0
+          if a == '':
+            a = 0
+          n = 0
+        elif len(var_split) == 2:
           if a == '':
             a = 1
           elif a == '-':
             a = -1
-          if len(constante) == 1:                         #sin x-> Error!!
-            print('ERROR: no hay x en un termino con ^')
-          elif constante[1].strip() == '':                #con x -> es un termino 'a*x^n'
-            self.coeficientes = [0]*n+[float(a)]            # PARSE!!
+          power_split = s.split('^')
+          if len(power_split) == 1: # es un termino lineal, n = 1
+            n = 1
+          elif len(power_split) == 2: # es un termino n
+            n = int(''.join(power_split[1].split()))
           else:
-            print('ERROR: mas de una x por termino')      #ERROR 'xx'
-        else:                                         #ERROR '^^^'
-          print('ERROR: mas de un ^ por termino')
+            print('ERROR: mas de un ^ por termino')
+        else:
+          print('ERROR: mas de una x por termino')
+        a = float(a)
+        self.coeficientes = [0]*n+[a]
       else:
         for i,a in enumerate(restas):
           A = Polinomio()
@@ -174,5 +164,5 @@ if __name__ == '__main__':
   print(P1)
 
   P3 = Polinomio()
-  P3.from_string('x + 1 - x^2 - 3x^3')
+  P3.from_string('x + 1 - x^ 2 - 3 x ^3')
   print(P3.get_coeficientes())
