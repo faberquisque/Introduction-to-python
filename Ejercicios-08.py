@@ -41,6 +41,3 @@ plt.show()
 ![](../figuras/ejercicio_08_2.png)
 '''
 
-'''3. **PARA ENTREGAR:**Notando que la curva en color negro corresponde 
-a la semisuma de las dos curvas en rojo, rehacer la siguiente figura:
-(../figuras/ejercicio_08_3.png)'''
