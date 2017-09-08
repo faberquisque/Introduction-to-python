@@ -29,7 +29,7 @@ def funcionPartida(x):
   else:
     return 0
 vecFuncionPartida = np.vectorize(funcionPartida)
-x = np.array([np.linspace(lim[i],lim[i+1],10) for i in range(len(lim)-1)])
+x = np.array([np.linspace(lim[i]*1.00001,lim[i+1]*0.99999,10) for i in range(len(lim)-1)])
 print(x)
 y = vecFuncionPartida(x)
 print(y)
