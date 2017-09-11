@@ -37,12 +37,15 @@ def metodoValorMedio(n=1000):
 equiespaciados logarítmicamente entre 100 y 10000. Para cada valor de $N$ calcular la estimación de $\pi$. Realizar un gráfico con el valor 
 estimado como función del número $N$ con los dos métodos (dos curvas en un solo gráfico)
 '''
-def comparacionMetodos(start=2,stop=4,num=20):
+def comparacionMetodos(metodo1,metodo2,start=2,stop=4,num=20):
+    plt.figure()
     N=np.logspace(start,stop,num)
-    pi1=np.array([metodoCocienteAreas(int(n)) for n in N])
-    pi2=np.array([metodoValorMedio(int(n)) for n in N])
-    plt.semilogx(N,pi1)
-    plt.semilogx(N,pi2)
+    pi1=np.array([metodo1(int(n)) for n in N])
+    pi2=np.array([metodo1(int(n)) for n in N])
+    plt.semilogx(N,pi1,'b', label=metodo1.__name__)
+    plt.semilogx(N,pi2,'r',label=metodo2.__name__)
+    plt.legend()
+    plt.axhline(y=np.pi)
     plt.grid(True)
     plt.show()
 
@@ -54,11 +57,12 @@ similar al siguiente (*el estilo de graficación no tiene que ser el mismo*)
 '''
 def normal(x,mean,sigma):
     return math.exp(-((x-mean)**2)/2/sigma**2)/math.sqrt(2*math.pi*sigma**2)
-def comparacionPorHistograma():
+def comparacionPorHistograma(metodo1,metodo2):
+    plt.figure()
     N=15000
     repetir=1000
-    pi1=np.array([metodoCocienteAreas(N) for i in range(repetir)])
-    pi2=np.array([metodoValorMedio(N) for i in range(repetir)])
+    pi1=np.array([metodo1(N) for i in range(repetir)])
+    pi2=np.array([metodo2(N) for i in range(repetir)])
     mean1=np.mean(pi1)
     mean2=np.mean(pi2)
     desv1=np.std(pi1)
@@ -66,8 +70,12 @@ def comparacionPorHistograma():
     x=np.linspace(3.05,3.25,100)
     normal1=np.array([normal(k,mean1,desv1) for k in x])
     normal2=np.array([normal(k,mean2,desv2) for k in x])
-    plt.plot(x,normal1)
-    plt.plot(x,normal2)
+    plt.plot(x,normal1,'b', label=metodo1.__name__)
+    plt.plot(x,normal2,'r',label=metodo2.__name__)
+    plt.legend()
+    plt.hist(pi1, 20, normed=1, facecolor='b', alpha=0.5)
+    plt.hist(pi2, 20, normed=1, facecolor='r', alpha=0.5)
+    plt.axvline(x=np.pi)
     plt.show()
     
 
@@ -87,9 +95,23 @@ $$ P = \frac{2 \ell}{t\, \pi} $$
 por lo que podemos calcular el valor de $\pi$ si estimamos la probabilidad $P$. Realizar una función que estime $\pi$ utilizando este método y 
 repetir las comparaciones de los dos puntos anteriores pero ahora utilizando este método y el de las áreas.
 '''
+def metodoBuffon(n=1000):
+    L=0.5
+    t=1
+    x1=t*np.random.random(n)
+    alfa=2*np.pi*np.random.random(n)
+    x2=L*np.cos(alfa)+x1
+    A=((x2<0) | ((x1<t/2) & (x2>t/2)) | ((x1>t/2) & (x2<t/2)) | (x2>t)).sum()
+    return 2*n*L/A/(t/2)
 
+'''----TEST----'''
+print('Gaston Michel')
 print(metodoCocienteAreas())
 print(metodoValorMedio())
-#comparacionMetodos()
-comparacionPorHistograma()
+print(metodoBuffon())
+comparacionMetodos(metodoCocienteAreas,metodoValorMedio)
+comparacionPorHistograma(metodoCocienteAreas,metodoValorMedio)
+comparacionMetodos(metodoCocienteAreas,metodoBuffon)
+comparacionPorHistograma(metodoCocienteAreas,metodoBuffon)
+print(metodoBuffon())
 print('finished!')
