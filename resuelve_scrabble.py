@@ -15,8 +15,43 @@ class Tile():
             self.repetition-=1
         else:
             raise NameError('Execedio la cantidad de fichas de la letra: {}'.format(self.letter))
+
+    def AddOne(self):
+        self.repetition+=1
+
     def __str__(self):
         return '{}: r={} v={}'.format(self.letter,self.repetition,self.value)
+
+class Word():
+    def __init__(self, string, alphabet):
+        self.tiles = {}
+        for char in string:
+            if char.isalpha()
+                if char in self.tiles.keys():
+                    self.tiles[char].AddOne()
+                else:
+                    self.tiles[char] = Tile(char,1,alphabet[char])
+    def AddTile(tile):
+        if tile.letter in self.tiles.keys():
+            self.tiles[tile.letter].AddOne()
+        else:
+            self.tiles[tile.letter] = Tile(tile.letter,1,alphabet[char])
+
+    def sum(self):
+        return sum([k.repetition*k.value for k in self.tiles.values])
+
+    def len(self):
+        return sum([k.repetition for k in self.tiles.values])
+
+    def isAbleToForm(self, string):
+
+class Alphabet(Word):
+    def __init__(self, fichas):
+        self.tiles = {k:Tile(k,r,v) for k, (r,v) in fichas.items()}
+    def newWord(self, string):
+        
+
+
 
 class Scrabble():
     def __init__(self, language = 'es'):
@@ -30,6 +65,16 @@ class Scrabble():
             raise NameError('Idioma no diponible')
         self.words = getWordsFromGZ(fileName)
         self.tiles = {k:Tile(k,r,v) for k, (r,v) in fichas.items()}
+        self.language = language
+        self.hand = {}
+    
+    def Solve(self, tiles, lenght=7):
+        if len(tiles)<lenght:
+            lenght = len(tiles) #maxima longitud de la palabra a formar
+        
+        for t in tiles:
+            self.tiles[t].RemoveOne() #chequear que existan suficientes fichas
+        
         
 def getWordsFromGZ(fileName):
     with gzip.open(fileName,'rt',encoding='utf-8') as file:
@@ -38,10 +83,10 @@ def getWordsFromGZ(fileName):
         unicodedata.normalize('NFKD', w).encode('ASCII', 'ignore').decode('utf-8')
         for w in words 
         if w.islower()
-        ] 
-        #remueve los nombres propios y reemplaza los caracteres con acento
+        ] #remueve los nombres propios y reemplaza los caracteres con acento
     #TO DO: reemplazar RR LL CH?
     return words
+def instring(a,b):
 
 ## TEST ##
 scrabble = Scrabble()
