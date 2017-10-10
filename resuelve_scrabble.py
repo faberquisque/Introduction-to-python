@@ -5,22 +5,12 @@ import gzip
 import unicodedata
 
 class Tile():
-    def __init__(self,letter, repetition, value):
+    def __init__(self,letter, value):
         self.letter = letter
-        self.repetition = repetition
         self.value = value
 
-    def RemoveOne(self):
-        if self.repetition > 0:
-            self.repetition-=1
-        else:
-            raise NameError('Execedio la cantidad de fichas de la letra: {}'.format(self.letter))
-
-    def AddOne(self):
-        self.repetition+=1
-
     def __str__(self):
-        return '{}: r={} v={}'.format(self.letter,self.repetition,self.value)
+        return '{}={}'.format(self.letter,self.value)
 
 class Word():
     def __init__(self, string, alphabet):
@@ -45,11 +35,16 @@ class Word():
 
     def isAbleToForm(self, string):
 
-class Alphabet(Word):
+class Bag():
     def __init__(self, fichas):
-        self.tiles = {k:Tile(k,r,v) for k, (r,v) in fichas.items()}
-    def newWord(self, string):
-        
+        self.tiles = []
+        for k, (r,v) in fichas.items()
+            t = Tile(k,v)
+            for i in r:
+                self.tiles.append(t)
+
+    
+
 
 
 
