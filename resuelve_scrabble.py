@@ -4,8 +4,25 @@ import matplotlib.pyplot as plt
 import gzip
 import unicodedata
 import argparse
-def translate(word, reverse=False):
-    mapa = [('rr','0'),('ch','1'),('ll','2')]
+
+RR = '0'
+CH = '1'
+LL = '2'
+BLANK = '#'
+
+REP = 0
+VAL = 1
+
+ENGLISH = 'en'
+SPANISH = 'es'
+
+PATH_ES = 'palabras.words.gz'
+PATH_EN = 'palabras_en.words.gz'
+
+MAX_RACK = 7
+
+def replaceSpecial(word, reverse=False):
+    mapa = [('rr',RR),('ch',CH),('ll',LL)]
     old = int(reverse)
     new = int(not reverse)
     for pair in mapa:
@@ -13,24 +30,33 @@ def translate(word, reverse=False):
             word = word.replace(pair[old],pair[new])
     return word
 
-language = 'es'
-rack = 'ved'
+language = SPANISH
+rack = '1rycga#u'
 parser = argparse.ArgumentParser()
-# parser.add_argument('rack',help="ingrese las letras que le tocaron. RR se ingresa como '0', CH como '1', LL como '2' y el comodin como '#'")
-parser.add_argument('-l', '--language', help="elija el lenguaje entre 'es' y 'en'", choices=['es','en'])
-parser.add_argument('-n',help='')
+# parser.add_argument('rack',help="ingrese las letras que le tocaron. RR se ingresa como {}, CH como {}, LL como {} y el comodin como {}".format(RR,CH,LL,BLANK))
+parser.add_argument('-l', '--language', help="elija el lenguaje entre {} y {}".format(SPANISH,ENGLISH), choices=[SPANISH,ENGLISH])
+parser.add_argument('-n',help='TO DO')
 parser.add_argument('-o','-output',help='escribe la salida en un archivo dado')
 args = parser.parse_args()
 
-if language == 'es':
-    fileName = 'palabras.words.gz'
-    tiles = {'0': (1, 8), '2': (1, 8), 'u': (5, 1), 'o': (9, 1), 'v': (1, 4), 'ñ': (1, 8), 'q': (1, 5), 'g': (2, 2), 'e': (12, 1), 'd': (5, 2), 'y': (1, 4), 'b': (2, 3), 'h': (2, 4), 'p': (2, 3), 'c': (4, 3), 'n': (5, 1), 'x': (1, 8), 'a': (12, 1), 'r': (5, 1), '#': (2, 0), 's': (6, 1), 'l': (4, 1), '1': (1, 5), 'j': (1, 8), 'z': (1, 10), 'f': (1, 4), 't': (4, 1), 'i': (6, 1), 'm': (2, 3)}
-elif language == 'en':
-    fileName = 'palabras_en.words.gz'
-    tiles = {'u': (4, 1), 'o': (8, 1), 'k': (1, 5), 'v': (2, 4), 'q': (1, 10), 'l': (4, 1), 'g': (3, 2), 'e': (12, 1), 'd': (4, 2), 'y': (2, 4), 'b': (2, 3), 'h': (2, 4), 'p': (2, 3), 'c': (2, 3), 'n': (6, 1), 'x': (1, 8), 'a': (9, 1), 'r': (6, 1), '#': (2, 0), 's': (4, 1), 'w': (2, 4), 'j': (1, 8), 'z': (1, 10), 'f': (2, 4), 't': (6, 1), 'i': (9, 1), 'm': (2, 3)}
+if language == SPANISH:
+    fileName = PATH_ES
+    tiles = {RR: (1, 8),CH: (1,5), LL: (1, 8), 'u': (5, 1), 'o': (9, 1), 'v': (1, 4), 'ñ': (1, 8), 'q': (1, 5), 'g': (2, 2), 'e': (12, 1), 'd': (5, 2), 'y': (1, 4), 'b': (2, 3), 'h': (2, 4), 'p': (2, 3), 'c': (4, 3), 'n': (5, 1), 'x': (1, 8), 'a': (12, 1), 'r': (5, 1), BLANK: (2, 0), 's': (6, 1), 'l': (4, 1), 'j': (1, 8), 'z': (1, 10), 'f': (1, 4), 't': (4, 1), 'i': (6, 1), 'm': (2, 3)}
+elif language == ENGLISH:
+    fileName = PATH_EN
+    tiles = {'u': (4, 1), 'o': (8, 1), 'k': (1, 5), 'v': (2, 4), 'q': (1, 10), 'l': (4, 1), 'g': (3, 2), 'e': (12, 1), 'd': (4, 2), 'y': (2, 4), 'b': (2, 3), 'h': (2, 4), 'p': (2, 3), 'c': (2, 3), 'n': (6, 1), 'x': (1, 8), 'a': (9, 1), 'r': (6, 1), BLANK: (2, 0), 's': (4, 1), 'w': (2, 4), 'j': (1, 8), 'z': (1, 10), 'f': (2, 4), 't': (6, 1), 'i': (9, 1), 'm': (2, 3)}
 else:
-    print('Idioma no soportado. Elija entre (es) y (en)')
+    print('Idioma no soportado. Elija entre {} y {}'.format(SPANISH,ENGLISH))
     exit(1)
+
+for letter in rack:
+    if letter in tiles.keys():
+        if rack.count(letter) > tiles[letter][REP]:
+            print('No hay suficientes fichas de la letra:', letter)
+            exit(1)
+    else:
+        print('El caracter',letter,'no participa del juego')
+        exit(1)
 
 wordlist = []
 try:
@@ -38,40 +64,31 @@ try:
         for line in file:
             if line.islower():
                 word = unicodedata.normalize('NFKD', line.strip()).encode('ASCII', 'ignore').decode('utf-8')
-                
-                wordlist.append(translate(word))
+                wordlist.append(replaceSpecial(word))
 except EnvironmentError:
     print('No se encuentra el archivo:',fileName)
     exit(1)
-
-for letter in rack:
-    if k, (rep,val) in tiles.items():
-        if rep > 0:
-            tiles[k] = (rep-1,val)
-        else:
-            print('No hay suficientes fichas de la letra:', letter)
-            exit(1)
-    else:
-        print('El caracter',letter,'no participa del juego')
 
 validwords = []
 for word in wordlist:
     isCandidate = True
     rack_letters = list(rack)
+    total = 0
 
     for letter in word:
         if letter in rack_letters:
             rack_letters.remove(letter)
+            total += tiles[letter][VAL]
         else:
-            isCandidate = False
-            break
-            
+            if BLANK in rack_letters:
+                rack_letters.remove(BLANK)
+                total += tiles[BLANK][VAL]
+            else:
+                isCandidate = False
+                break
     if isCandidate:
-        total = 0
-        for letter in word:
-            total += tiles[letter][1]
         validwords.append((total,word))
 
 validwords.sort(reverse=True)
 for (score,word) in validwords[0:5]:
-    print('{}:\t{} puntos'.format(translate(word,reverse=True),score))
+    print('{}:   \t{} puntos'.format(replaceSpecial(word,reverse=True),score))
