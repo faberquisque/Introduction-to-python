@@ -3,92 +3,75 @@ import numpy as np
 import matplotlib.pyplot as plt
 import gzip
 import unicodedata
+import argparse
+def translate(word, reverse=False):
+    mapa = [('rr','0'),('ch','1'),('ll','2')]
+    old = int(reverse)
+    new = int(not reverse)
+    for pair in mapa:
+        if pair[old] in word:
+            word = word.replace(pair[old],pair[new])
+    return word
 
-class Tile():
-    def __init__(self,letter, value):
-        self.letter = letter
-        self.value = value
+language = 'es'
+rack = 'ved'
+parser = argparse.ArgumentParser()
+# parser.add_argument('rack',help="ingrese las letras que le tocaron. RR se ingresa como '0', CH como '1', LL como '2' y el comodin como '#'")
+parser.add_argument('-l', '--language', help="elija el lenguaje entre 'es' y 'en'", choices=['es','en'])
+parser.add_argument('-n',help='')
+parser.add_argument('-o','-output',help='escribe la salida en un archivo dado')
+args = parser.parse_args()
 
-    def __str__(self):
-        return '{}={}'.format(self.letter,self.value)
+if language == 'es':
+    fileName = 'palabras.words.gz'
+    tiles = {'0': (1, 8), '2': (1, 8), 'u': (5, 1), 'o': (9, 1), 'v': (1, 4), 'ñ': (1, 8), 'q': (1, 5), 'g': (2, 2), 'e': (12, 1), 'd': (5, 2), 'y': (1, 4), 'b': (2, 3), 'h': (2, 4), 'p': (2, 3), 'c': (4, 3), 'n': (5, 1), 'x': (1, 8), 'a': (12, 1), 'r': (5, 1), '#': (2, 0), 's': (6, 1), 'l': (4, 1), '1': (1, 5), 'j': (1, 8), 'z': (1, 10), 'f': (1, 4), 't': (4, 1), 'i': (6, 1), 'm': (2, 3)}
+elif language == 'en':
+    fileName = 'palabras_en.words.gz'
+    tiles = {'u': (4, 1), 'o': (8, 1), 'k': (1, 5), 'v': (2, 4), 'q': (1, 10), 'l': (4, 1), 'g': (3, 2), 'e': (12, 1), 'd': (4, 2), 'y': (2, 4), 'b': (2, 3), 'h': (2, 4), 'p': (2, 3), 'c': (2, 3), 'n': (6, 1), 'x': (1, 8), 'a': (9, 1), 'r': (6, 1), '#': (2, 0), 's': (4, 1), 'w': (2, 4), 'j': (1, 8), 'z': (1, 10), 'f': (2, 4), 't': (6, 1), 'i': (9, 1), 'm': (2, 3)}
+else:
+    print('Idioma no soportado. Elija entre (es) y (en)')
+    exit(1)
 
-class Word():
-    def __init__(self, string, alphabet):
-        self.tiles = {}
-        for char in string:
-            if char.isalpha()
-                if char in self.tiles.keys():
-                    self.tiles[char].AddOne()
-                else:
-                    self.tiles[char] = Tile(char,1,alphabet[char])
-    def AddTile(tile):
-        if tile.letter in self.tiles.keys():
-            self.tiles[tile.letter].AddOne()
-        else:
-            self.tiles[tile.letter] = Tile(tile.letter,1,alphabet[char])
-
-    def sum(self):
-        return sum([k.repetition*k.value for k in self.tiles.values])
-
-    def len(self):
-        return sum([k.repetition for k in self.tiles.values])
-
-    def isAbleToForm(self, string):
-
-class Bag():
-    def __init__(self, fichas):
-        self.tiles = []
-        for k, (r,v) in fichas.items()
-            t = Tile(k,v)
-            for i in r:
-                self.tiles.append(t)
-
-    
-
-
-
-
-class Scrabble():
-    def __init__(self, language = 'es'):
-        if language == 'es':
-            fileName = 'palabras.words.gz'
-            fichas = {'rr': (1, 8), 'll': (1, 8), 'u': (5, 1), 'o': (9, 1), 'v': (1, 4), 'ñ': (1, 8), 'q': (1, 5), 'g': (2, 2), 'e': (12, 1), 'd': (5, 2), 'y': (1, 4), 'b': (2, 3), 'h': (2, 4), 'p': (2, 3), 'c': (4, 3), 'n': (5, 1), 'x': (1, 8), 'a': (12, 1), 'r': (5, 1), 'blank': (2, 0), 's': (6, 1), 'l': (4, 1), 'ch': (1, 5), 'j': (1, 8), 'z': (1, 10), 'f': (1, 4), 't': (4, 1), 'i': (6, 1), 'm': (2, 3)}
-        elif language == 'en':
-            fileName = 'palabras_en.words.gz'
-            fichas = {'u': (4, 1), 'o': (8, 1), 'k': (1, 5), 'v': (2, 4), 'q': (1, 10), 'l': (4, 1), 'g': (3, 2), 'e': (12, 1), 'd': (4, 2), 'y': (2, 4), 'b': (2, 3), 'h': (2, 4), 'p': (2, 3), 'c': (2, 3), 'n': (6, 1), 'x': (1, 8), 'a': (9, 1), 'r': (6, 1), 'blank': (2, 0), 's': (4, 1), 'w': (2, 4), 'j': (1, 8), 'z': (1, 10), 'f': (2, 4), 't': (6, 1), 'i': (9, 1), 'm': (2, 3)}
-        else:
-            raise NameError('Idioma no diponible')
-        self.words = getWordsFromGZ(fileName)
-        self.tiles = {k:Tile(k,r,v) for k, (r,v) in fichas.items()}
-        self.language = language
-        self.hand = {}
-    
-    def Solve(self, tiles, lenght=7):
-        if len(tiles)<lenght:
-            lenght = len(tiles) #maxima longitud de la palabra a formar
-        
-        for t in tiles:
-            self.tiles[t].RemoveOne() #chequear que existan suficientes fichas
-        
-        
-def getWordsFromGZ(fileName):
+wordlist = []
+try:
     with gzip.open(fileName,'rt',encoding='utf-8') as file:
-        words = file.read().splitlines()
-    words = [
-        unicodedata.normalize('NFKD', w).encode('ASCII', 'ignore').decode('utf-8')
-        for w in words 
-        if w.islower()
-        ] #remueve los nombres propios y reemplaza los caracteres con acento
-    #TO DO: reemplazar RR LL CH?
-    return words
-def instring(a,b):
+        for line in file:
+            if line.islower():
+                word = unicodedata.normalize('NFKD', line.strip()).encode('ASCII', 'ignore').decode('utf-8')
+                
+                wordlist.append(translate(word))
+except EnvironmentError:
+    print('No se encuentra el archivo:',fileName)
+    exit(1)
 
-## TEST ##
-scrabble = Scrabble()
-print(scrabble.tiles['a'])
-print(len(getWordsFromGZ('palabras.words.gz')))
-# Idioma: es 
-#fichas_es = {'rr': (1, 8), 'll': (1, 8), 'u': (5, 1), 'o': (9, 1), 'v': (1, 4), 'ñ': (1, 8), 'q': (1, 5), 'g': (2, 2), 'e': (12, 1), 'd': (5, 2), 'y': (1, 4), 'b': (2, 3), 'h': (2, 4), 'p': (2, 3), 'c': (4, 3), 'n': (5, 1), 'x': (1, 8), 'a': (12, 1), 'r': (5, 1), 'blank': (2, 0), 's': (6, 1), 'l': (4, 1), 'ch': (1, 5), 'j': (1, 8), 'z': (1, 10), 'f': (1, 4), 't': (4, 1), 'i': (6, 1), 'm': (2, 3)}
+for letter in rack:
+    if k, (rep,val) in tiles.items():
+        if rep > 0:
+            tiles[k] = (rep-1,val)
+        else:
+            print('No hay suficientes fichas de la letra:', letter)
+            exit(1)
+    else:
+        print('El caracter',letter,'no participa del juego')
 
-# Idioma: en 
-#fichas_en = {'u': (4, 1), 'o': (8, 1), 'k': (1, 5), 'v': (2, 4), 'q': (1, 10), 'l': (4, 1), 'g': (3, 2), 'e': (12, 1), 'd': (4, 2), 'y': (2, 4), 'b': (2, 3), 'h': (2, 4), 'p': (2, 3), 'c': (2, 3), 'n': (6, 1), 'x': (1, 8), 'a': (9, 1), 'r': (6, 1), 'blank': (2, 0), 's': (4, 1), 'w': (2, 4), 'j': (1, 8), 'z': (1, 10), 'f': (2, 4), 't': (6, 1), 'i': (9, 1), 'm': (2, 3)}
+validwords = []
+for word in wordlist:
+    isCandidate = True
+    rack_letters = list(rack)
+
+    for letter in word:
+        if letter in rack_letters:
+            rack_letters.remove(letter)
+        else:
+            isCandidate = False
+            break
+            
+    if isCandidate:
+        total = 0
+        for letter in word:
+            total += tiles[letter][1]
+        validwords.append((total,word))
+
+validwords.sort(reverse=True)
+for (score,word) in validwords[0:5]:
+    print('{}:\t{} puntos'.format(translate(word,reverse=True),score))
