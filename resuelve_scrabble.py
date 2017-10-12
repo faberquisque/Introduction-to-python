@@ -38,20 +38,23 @@ def replaceSpecial(word, reverse=False):
 
 ### ARGUMENT PARSER SETUP ###
 parser = argparse.ArgumentParser()
-parser.add_argument('--rack', 
-    default='1rycga#u', 
-    help="ingrese las letras que le tocaron. RR se ingresa como {}, CH como {}, LL como {} y el comodin como {}".format(RR,CH,LL,BLANK))
-parser.add_argument('-m',
-    '--model', 
-    default='.',
-    help="""ingrese un patron que quiera que las palabras cumplan.
-            'A...Z' para indicar las letras presentes en el tablero
-            '.' para forzar la colocacion de una de sus fichas
-            '\A' y '\Z' para indicar el inicio o fin  del tablero 
+group = parser.add_mutually_exclusive_group(required=True)
+group.add_argument('-s',help='TO DO', type=int, choices=range(100, 10000))
+group.add_argument('-n',help='TO DO', type=int, choices=range(1, 30))
+group.add_argument('-r','--rack',default='1rycga#u', 
+    help="""ingrese las letras que le tocaron. 
+            RR se ingresa como {!r}, 
+            CH como {!r}, 
+            LL como {!r} 
+            y el comodin como {!r}""".format(RR,CH,LL,BLANK))
+parser.add_argument('-m','--model',default='.',
+    help="""ingrese un patron que quiera que las palabras cumplan.\n
+            'A...Z' para indicar  letras presentes en el tablero.\n
+            '.' para forzar la colocacion de una de sus fichas.\n
+            '\A' y '\Z' para indicar el inicio o fin del tablero.\n
             Ejemplo: .a.o\Z -> abaco""")
-parser.add_argument('-l', '--language', help="elija el lenguaje entre {} (default) y {}".format(SPANISH,ENGLISH), choices=[SPANISH,ENGLISH], default=SPANISH)
-parser.add_argument('-n',help='TO DO')
-parser.add_argument('-o','-output',help='escribe la salida en un archivo dado')
+parser.add_argument('-l', '--language', help="elija el lenguaje entre {!r} (default) y {!r}".format(SPANISH,ENGLISH), choices=[SPANISH,ENGLISH], default=SPANISH)
+parser.add_argument('-o','--output',help='escribe la salida en un archivo dado')
 args = parser.parse_args()
 
 ### LANGUAGE SETUP ###
@@ -65,18 +68,18 @@ elif args.language == ENGLISH:
 ### CHECK MODEL INPUT ###
 for char in args.model:
     if char not in MODEL_LIST:
-        print('El caracter {} en el patron, no esta permitido'.format(char))
+        print('El caracter {!r} en el patron, no esta permitido'.format(char))
         exit(1)
 pattern = re.compile(args.model)
     
 ### CHECK RACK INPUT ###
-for letter in args.rack:
+for letter in args.rack.lower():
     if letter in tiles.keys():
         if args.rack.count(letter) > tiles[letter][REP]:
             print('No hay suficientes fichas de la letra:', letter)
             exit(1)
     else:
-        print('El caracter',letter,'no participa del juego')
+        print('El caracter {!r} no participa del juego'.format(letter))
         exit(1)
 
 ### TRY LOAD WORDLIST ###
@@ -88,14 +91,14 @@ try:
                 word = unicodedata.normalize('NFKD', line.strip()).encode('ASCII', 'ignore').decode('utf-8')
                 wordlist.append(replaceSpecial(word))
 except EnvironmentError:
-    print('No se encuentra el archivo:',fileName)
+    print('No se encuentra el archivo: {!r}'.format(fileName))
     exit(1)
 
 ### CHECK EVERY WORD IN WORDLIST ###
 validwords = []
 for word in wordlist:
     isCandidate = True
-    rack_letters = list(args.rack)
+    rack_letters = list(args.rack.lower())
     total = 0
 
     for letter in word:
