@@ -19,6 +19,8 @@ VAL = 1
 ENGLISH = 'en'
 SPANISH = 'es'
 
+DEFAULT_MODEL = '.'
+
 PATH_ES = 'palabras.words.gz'
 PATH_EN = 'palabras_en.words.gz'
 
@@ -36,18 +38,23 @@ def replaceSpecial(word, reverse=False):
             word = word.replace(pair[old],pair[new])
     return word
 
+def safeopen(file):
+    import os
+    os.makedirs(os.path.dirname(file), exist_ok=True)
+    return open(file,'w') 
+3   
 ### ARGUMENT PARSER SETUP ###
 parser = argparse.ArgumentParser()
 group = parser.add_mutually_exclusive_group(required=True)
 group.add_argument('-s',help='TO DO', type=int, choices=range(100, 10000))
 group.add_argument('-n',help='TO DO', type=int, choices=range(1, 30))
-group.add_argument('-r','--rack',default='1rycga#u', 
+group.add_argument('-r','--rack', 
     help="""ingrese las letras que le tocaron. 
             RR se ingresa como {!r}, 
             CH como {!r}, 
             LL como {!r} 
             y el comodin como {!r}""".format(RR,CH,LL,BLANK))
-parser.add_argument('-m','--model',default='.',
+parser.add_argument('-m','--model',default=DEFAULT_MODEL,
     help="""ingrese un patron que quiera que las palabras cumplan.\n
             'A...Z' para indicar  letras presentes en el tablero.\n
             '.' para forzar la colocacion de una de sus fichas.\n
@@ -55,7 +62,7 @@ parser.add_argument('-m','--model',default='.',
             Ejemplo: .a.o\Z -> abaco""")
 parser.add_argument('-l', '--language', help="elija el lenguaje entre {!r} (default) y {!r}".format(SPANISH,ENGLISH), choices=[SPANISH,ENGLISH], default=SPANISH)
 parser.add_argument('-o','--output',help='escribe la salida en un archivo dado')
-args = parser.parse_args()
+args = parser.parse_args(['-r','cosaoa','-m','.o.a'])
 
 ### LANGUAGE SETUP ###
 if args.language == SPANISH:
@@ -66,8 +73,12 @@ elif args.language == ENGLISH:
     tiles = {'u': (4, 1), 'o': (8, 1), 'k': (1, 5), 'v': (2, 4), 'q': (1, 10), 'l': (4, 1), 'g': (3, 2), 'e': (12, 1), 'd': (4, 2), 'y': (2, 4), 'b': (2, 3), 'h': (2, 4), 'p': (2, 3), 'c': (2, 3), 'n': (6, 1), 'x': (1, 8), 'a': (9, 1), 'r': (6, 1), BLANK: (2, 0), 's': (4, 1), 'w': (2, 4), 'j': (1, 8), 'z': (1, 10), 'f': (2, 4), 't': (6, 1), 'i': (9, 1), 'm': (2, 3)}
 
 ### CHECK MODEL INPUT ###
-for char in args.model:
-    if char not in MODEL_LIST:
+board = ''
+for letter in args.model.replace('\A','').replace('\Z','').lower():
+    if letter in MODEL_LIST:
+        if letter in tiles.keys():
+            board += letter
+    else:
         print('El caracter {!r} en el patron, no esta permitido'.format(char))
         exit(1)
 pattern = re.compile(args.model)
@@ -99,19 +110,21 @@ validwords = []
 for word in wordlist:
     isCandidate = True
     rack_letters = list(args.rack.lower())
+    board_letters = list(board)
     total = 0
 
     for letter in word:
-        if letter in rack_letters:
+        if letter in board_letters:
+            board_letters.remove(letter)
+        elif letter in rack_letters:
             rack_letters.remove(letter)
             total += tiles[letter][VAL]
+        elif BLANK in rack_letters:
+            rack_letters.remove(BLANK)
+            total += tiles[BLANK][VAL]
         else:
-            if BLANK in rack_letters:
-                rack_letters.remove(BLANK)
-                total += tiles[BLANK][VAL]
-            else:
-                isCandidate = False
-                break # pasa a la siguiente palabra
+            isCandidate = False
+            break # pasa a la siguiente palabra
 
     if isCandidate:
         if pattern.search(word) is not None:
@@ -119,5 +132,12 @@ for word in wordlist:
 
 ### OUTPUT ###
 validwords.sort(reverse=True)
-for (score,word) in validwords[0:5]:
-    print('{}:   \t{} puntos'.format(replaceSpecial(word,reverse=True),score))
+if len(validwords) == 0:
+    print('No se encontraron palabras!')
+else:
+    if args.output is None
+        for (score,word) in validwords[0:5]:
+            print('{}:   \t{} puntos'.format(replaceSpecial(word,reverse=True),score))
+    else:
+        
+
