@@ -6,7 +6,7 @@ import unicodedata
 import argparse
 import re
 import string
-
+import intertools
 ### CONSTANTS ###
 RR = '0'
 CH = '1'
@@ -39,30 +39,37 @@ def replaceSpecial(word, reverse=False):
     return word
 
 def safeopen(file):
-    import os
-    os.makedirs(os.path.dirname(file), exist_ok=True)
+    from os import makedirs
+    from os.path import dirname
+    makedirs(dirname(file), exist_ok=True)
     return open(file,'w') 
-3   
+def randomRack(tiles,n=MAX_RACK):
+    tiles_list = list(''.join(letter*tiles[letter][REP] for letter in tiles.keys()))
+    np.random.shuffle(tiles_list)
+    print(tiles_list[:n])
+
 ### ARGUMENT PARSER SETUP ###
 parser = argparse.ArgumentParser()
 group = parser.add_mutually_exclusive_group(required=True)
-group.add_argument('-s',help='TO DO', type=int, choices=range(100, 10000))
-group.add_argument('-n',help='TO DO', type=int, choices=range(1, 30))
+group.add_argument('-s', '--stadistics',help='TO DO', action='store_true')
+group.add_argument('-n',help='TO DO', type=int)
 group.add_argument('-r','--rack', 
     help="""ingrese las letras que le tocaron. 
             RR se ingresa como {!r}, 
             CH como {!r}, 
+
             LL como {!r} 
             y el comodin como {!r}""".format(RR,CH,LL,BLANK))
 parser.add_argument('-m','--model',default=DEFAULT_MODEL,
-    help="""ingrese un patron que quiera que las palabras cumplan.\n
-            'A...Z' para indicar  letras presentes en el tablero.\n
-            '.' para forzar la colocacion de una de sus fichas.\n
-            '\A' y '\Z' para indicar el inicio o fin del tablero.\n
+    help="""ingrese un patron que quiera que las palabras cumplan.
+            'A...Z' para indicar  letras presentes en el tablero.
+            '.' para forzar la colocacion de una de sus fichas.
+            '\A' y '\Z' para indicar el inicio o fin del tablero.
             Ejemplo: .a.o\Z -> abaco""")
 parser.add_argument('-l', '--language', help="elija el lenguaje entre {!r} (default) y {!r}".format(SPANISH,ENGLISH), choices=[SPANISH,ENGLISH], default=SPANISH)
 parser.add_argument('-o','--output',help='escribe la salida en un archivo dado')
-args = parser.parse_args(['-r','cosaoa','-m','.o.a'])
+# args = parser.parse_args(['-r','cosaoa','-m','.o.a']) #Test!
+args = parser.parse_args()
 
 ### LANGUAGE SETUP ###
 if args.language == SPANISH:
@@ -79,19 +86,29 @@ for letter in args.model.replace('\A','').replace('\Z','').lower():
         if letter in tiles.keys():
             board += letter
     else:
-        print('El caracter {!r} en el patron, no esta permitido'.format(char))
+        print('El caracter {!r} en el modelo, no esta permitido'.format(letter))
         exit(1)
 pattern = re.compile(args.model)
     
-### CHECK RACK INPUT ###
-for letter in args.rack.lower():
-    if letter in tiles.keys():
-        if args.rack.count(letter) > tiles[letter][REP]:
-            print('No hay suficientes fichas de la letra:', letter)
+### POPULATE RACKLIST ###
+racklist = []
+if args.rack is not None:
+    ### CHECK RACK INPUT ###
+    for letter in args.rack.lower():
+        if letter in tiles.keys():
+            if args.rack.count(letter) > tiles[letter][REP]:
+                print('No hay suficientes fichas de la letra:', letter)
+                exit(1)
+        else:
+            print('El caracter {!r} no participa del juego'.format(letter))
             exit(1)
-    else:
-        print('El caracter {!r} no participa del juego'.format(letter))
-        exit(1)
+    racklist.append(args.rack.lower())
+else:
+    ### POPULATE RANDOM RACKS ###
+    tiles_list = list(''.join(letter*tiles[letter][REP] for letter in tiles.keys()))
+    for i in range(args.n):
+        np.random.shuffle(tiles_list)
+        racklist.append(''.join(tiles_list[:MAX_RACK]))
 
 ### TRY LOAD WORDLIST ###
 wordlist = []
@@ -101,43 +118,65 @@ try:
             if line.islower():
                 word = unicodedata.normalize('NFKD', line.strip()).encode('ASCII', 'ignore').decode('utf-8')
                 wordlist.append(replaceSpecial(word))
-except EnvironmentError:
+except FileNotFoundError:
     print('No se encuentra el archivo: {!r}'.format(fileName))
     exit(1)
 
-### CHECK EVERY WORD IN WORDLIST ###
-validwords = []
-for word in wordlist:
-    isCandidate = True
-    rack_letters = list(args.rack.lower())
-    board_letters = list(board)
-    total = 0
+### CHECK EVERY WORD IN WORDLIST FOR EVERY RACK ###
+output = {}
+for rack in racklist:
+    validwords = []
+    for word in wordlist:
+        isCandidate = True
+        rack_letters = list(rack)
+        board_letters = list(board)
+        total = 0
 
-    for letter in word:
-        if letter in board_letters:
-            board_letters.remove(letter)
-        elif letter in rack_letters:
-            rack_letters.remove(letter)
-            total += tiles[letter][VAL]
-        elif BLANK in rack_letters:
-            rack_letters.remove(BLANK)
-            total += tiles[BLANK][VAL]
-        else:
-            isCandidate = False
-            break # pasa a la siguiente palabra
+        for letter in word:
+            if letter in board_letters:
+                board_letters.remove(letter)
+            elif letter in rack_letters:
+                rack_letters.remove(letter)
+                total += tiles[letter][VAL]
+            elif BLANK in rack_letters:
+                rack_letters.remove(BLANK)
+                total += tiles[BLANK][VAL]
+            else:
+                isCandidate = False
+                break # pasa a la siguiente palabra
 
-    if isCandidate:
-        if pattern.search(word) is not None:
-            validwords.append((total,word))
+        if isCandidate:
+            if pattern.search(word) is not None:
+                validwords.append((total,word))
+                
+    validwords.sort(reverse=True)
+    output[rack] = validwords[0]
 
-### OUTPUT ###
-validwords.sort(reverse=True)
-if len(validwords) == 0:
-    print('No se encontraron palabras!')
-else:
-    if args.output is None
-        for (score,word) in validwords[0:5]:
-            print('{}:   \t{} puntos'.format(replaceSpecial(word,reverse=True),score))
+
+### OUTPUT PREPARATION ###
+s = 'Resultado:'
+if args.rack is not None:
+    if len(validwords) == 0:
+        s+='\nNo se encontraron palabras!'
     else:
-        
+        for (score,word) in validwords:
+            s+='\n{} puntos: {}'.format(score,replaceSpecial(word,reverse=True))
+else:
+    if args.stadistics:
+        hist = { score : frecuency for }
+    else:
+        for rack, (score, word) in output.items():
+            if len(validwords) == 0:
+                s+='\nrack: {!r}, no se encontraron palabras'.format(rack)
+            else:
+                s+='\nrack: {!r}, puntos: {}, palabra: {!r}'.format(rack,score,replaceSpecial(word,reverse=True))
 
+### PRINT OUTPUT ###
+if args.output is None:
+    print(s)
+else:
+    with safeopen(args.output) as file:
+        if args.output.endswith('.png'):
+            raise NotImplementedError
+        else:
+            file.write(s)
