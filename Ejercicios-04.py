@@ -132,6 +132,13 @@ def WriteStringToFile(fileName, infoString):
     file.write(infoString)
     file.close()
 
+
+def safeopen(file):
+    from os import makedirs
+    from os.path import dirname
+    makedirs(dirname(file), exist_ok=True)
+    return open(file,'w') 
+
 '''3.4. Finalmente, escriba también el código llamando a las funciones 
     anteriores para realizar el trabajo de lectura y escritura de los elementos 
     en archivos.

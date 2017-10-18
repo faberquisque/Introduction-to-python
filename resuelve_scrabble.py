@@ -6,7 +6,7 @@ import unicodedata
 import argparse
 import re
 import string
-import intertools
+
 ### CONSTANTS ###
 RR = '0'
 CH = '1'
@@ -25,6 +25,10 @@ PATH_ES = 'palabras.words.gz'
 PATH_EN = 'palabras_en.words.gz'
 
 MAX_RACK = 7
+MAX_OUTPUT = 5
+
+EMPTY = ''
+EMPTY_SCORE = 0
 
 MODEL_LIST = string.ascii_lowercase+'\A'+'\Z'+'.'+RR+CH+LL
 
@@ -38,11 +42,6 @@ def replaceSpecial(word, reverse=False):
             word = word.replace(pair[old],pair[new])
     return word
 
-def safeopen(file):
-    from os import makedirs
-    from os.path import dirname
-    makedirs(dirname(file), exist_ok=True)
-    return open(file,'w') 
 def randomRack(tiles,n=MAX_RACK):
     tiles_list = list(''.join(letter*tiles[letter][REP] for letter in tiles.keys()))
     np.random.shuffle(tiles_list)
@@ -51,8 +50,7 @@ def randomRack(tiles,n=MAX_RACK):
 ### ARGUMENT PARSER SETUP ###
 parser = argparse.ArgumentParser()
 group = parser.add_mutually_exclusive_group(required=True)
-group.add_argument('-s', '--stadistics',help='TO DO', action='store_true')
-group.add_argument('-n',help='TO DO', type=int)
+group.add_argument('-n',help='ingrese el numero de veces que quiere sortear rack', type=int)
 group.add_argument('-r','--rack', 
     help="""ingrese las letras que le tocaron. 
             RR se ingresa como {!r}, 
@@ -67,8 +65,8 @@ parser.add_argument('-m','--model',default=DEFAULT_MODEL,
             '\A' y '\Z' para indicar el inicio o fin del tablero.
             Ejemplo: .a.o\Z -> abaco""")
 parser.add_argument('-l', '--language', help="elija el lenguaje entre {!r} (default) y {!r}".format(SPANISH,ENGLISH), choices=[SPANISH,ENGLISH], default=SPANISH)
+parser.add_argument('-s', '--stadistics',help='realiza un histograma del resultado del argumento -n. si -o termina en .png se genera una figura', action='store_true')
 parser.add_argument('-o','--output',help='escribe la salida en un archivo dado')
-# args = parser.parse_args(['-r','cosaoa','-m','.o.a']) #Test!
 args = parser.parse_args()
 
 ### LANGUAGE SETUP ###
@@ -125,7 +123,7 @@ except FileNotFoundError:
 ### CHECK EVERY WORD IN WORDLIST FOR EVERY RACK ###
 output = {}
 for rack in racklist:
-    validwords = []
+    validwords = [(EMPTY_SCORE,EMPTY)]
     for word in wordlist:
         isCandidate = True
         rack_letters = list(rack)
@@ -156,27 +154,35 @@ for rack in racklist:
 ### OUTPUT PREPARATION ###
 s = 'Resultado:'
 if args.rack is not None:
-    if len(validwords) == 0:
+    if len(validwords) == 1:
         s+='\nNo se encontraron palabras!'
     else:
-        for (score,word) in validwords:
+        for (score,word) in validwords[0:MAX_OUTPUT]:
             s+='\n{} puntos: {}'.format(score,replaceSpecial(word,reverse=True))
 else:
     if args.stadistics:
-        hist = { score : frecuency for }
+        data = [score for score, word in output.values()]
+        scores = range(max(data)+1)
+        frecuency=[]
+        for i in scores:
+            frecuency.append(data.count(i))
+        for score, frec in zip(scores,frecuency):
+            s+='\n{} puntos: {} veces'.format(score,frec)
     else:
         for rack, (score, word) in output.items():
-            if len(validwords) == 0:
-                s+='\nrack: {!r}, no se encontraron palabras'.format(rack)
-            else:
-                s+='\nrack: {!r}, puntos: {}, palabra: {!r}'.format(rack,score,replaceSpecial(word,reverse=True))
+            s+='\nrack: {!r}, puntos: {}, palabra: {!r}'.format(rack,score,replaceSpecial(word,reverse=True))
 
 ### PRINT OUTPUT ###
 if args.output is None:
     print(s)
 else:
-    with safeopen(args.output) as file:
-        if args.output.endswith('.png'):
-            raise NotImplementedError
-        else:
+    if args.output.endswith('.png'):
+        plt.bar(scores,frecuency)
+        plt.xticks(scores)
+        plt.xlabel('Puntaje')
+        plt.ylabel('Frecuencia')
+        plt.title('Histograma de palabras de maximo\n puntaje para {} racks elegidos al azar'.format(args.n))
+        plt.savefig(args.output)
+    else:
+        with open(args.output,'w') as file:
             file.write(s)
