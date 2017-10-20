@@ -42,11 +42,6 @@ def replaceSpecial(word, reverse=False):
             word = word.replace(pair[old],pair[new])
     return word
 
-def randomRack(tiles,n=MAX_RACK):
-    tiles_list = list(''.join(letter*tiles[letter][REP] for letter in tiles.keys()))
-    np.random.shuffle(tiles_list)
-    print(tiles_list[:n])
-
 ### ARGUMENT PARSER SETUP ###
 parser = argparse.ArgumentParser()
 group = parser.add_mutually_exclusive_group(required=True)
@@ -151,7 +146,7 @@ for rack in racklist:
     output[rack] = validwords[0]
 
 
-### OUTPUT PREPARATION ###
+### OUTPUT POST-PROCESSING ###
 s = 'Resultado:'
 if args.rack is not None:
     if len(validwords) == 1:
@@ -172,7 +167,7 @@ else:
         for rack, (score, word) in output.items():
             s+='\nrack: {!r}, puntos: {}, palabra: {!r}'.format(rack,score,replaceSpecial(word,reverse=True))
 
-### PRINT OUTPUT ###
+### OUTPUT PRINTING ###
 if args.output is None:
     print(s)
 else:
